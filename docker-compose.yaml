@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  smart-sales-mongodb-server:
+    image: mongo:latest
+    container_name: 'smart-sales-mongodb-server'
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+      - MONGODB_USER="admin"
+      - MONGODB_PASS="password"
+    volumes:
+      - mongodb-data-volume:/data/db
+    ports:
+      - 27022:27017
+    command: mongod --logpath=/dev/null
+
+  nodejs-smart-sales:
+    image: node:17.8.0
+    container_name: 'nodejs-smart-sales'
+    ports:
+      - '5000:5000'
+    environment:
+      NODEJS_STARTER_ENV: local
+      DB_SCHEME: mongodb
+      DB_USER_NAME: admin
+      DB_PASSWORD: password
+      DB_NAME: STARTER_KIT
+      DB_HOST: smart-sales-mongodb-server
+      DB_PORT: 27017
+      API_SERVER_PORT: 5000
+      SERVER_HOST_URL: 0.0.0.0
+    volumes:
+      - ./:/nodejs-smart-sales
+    working_dir: /nodejs-smart-sales
+    command: npm start
+
+volumes:
+  mongodb-data-volume:
